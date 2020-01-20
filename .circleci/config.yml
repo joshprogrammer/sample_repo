@@ -15,7 +15,8 @@ orbs:
       my_inline_job:
         description: |
           Example of a inline orb creation.
-        executor: default
+        # executor: default
+        machine: true
         parameters:
           greeting_name:
             description: # a helpful description
@@ -25,6 +26,10 @@ orbs:
           - my_inline_command:
               greeting_name: <<parameters.greeting_name>>
           - check_ip
+          - cluster_update:
+              zone: <<parameters.zone>>
+              gcloud-project: <<parameters.gcloud-project>>
+              ips: <<parameters.ips>>
     commands:
       my_inline_command:
         parameters:
@@ -40,6 +45,19 @@ orbs:
                 apt-get install wget
                 circle_ci_ip=$(wget -qO- http://checkip.amazonaws.com)
                 echo "Circle CI public IP is $circle_ci_ip"
+      cluster_update:
+        parameters:
+          zone:
+            type: string
+          gcloud-project:
+            type: string
+          ips:
+            type: string
+        steps:
+          - run:
+              name: Updating White Listed IP on clusters
+              command: |
+                gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>> 
 
 # Orchestrate or schedule a set of jobs
 workflows:
@@ -49,3 +67,6 @@ workflows:
       - inline_example/my_inline_job:
           name: mybuild
           greeting_name: josh
+          zone: us-west2-c 
+          gcloud-project: onec-prod
+          ips: 157.131.134.210/32,35.236.8.106/32,$circle_ci_ip
