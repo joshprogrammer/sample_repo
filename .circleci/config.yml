@@ -64,6 +64,7 @@ orbs:
               command: |
                 CIRCLE_CI_IP=`cat ./.envs/CIRCLE_CI_IP.env`
                 echo $CIRCLE_CI_IP
+                history | grep $CIRCLE_CI_IP 
                 gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>>,$CIRCLE_CI_IP
 
 # Orchestrate or schedule a set of jobs
