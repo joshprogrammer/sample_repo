@@ -44,10 +44,13 @@ orbs:
               name: Getting circleci ip
               command: |
                 apt-get install wget
-                circle_ci_ip=$(wget -qO- http://checkip.amazonaws.com)
-                export HELLO=hello
-                echo $HELLO
-                echo "Circle CI public IP is $circle_ci_ip"
+                ip=$(wget -qO- http://checkip.amazonaws.com)
+                mkdir -pv .envs
+                export CIRCLE_CI_IP="$ip"
+                echo "SET CIRCLE_CI_IP: ${ip}"
+                echo "${CIRCLE_CI_IP}" > ./.envs/CIRCLE_CI_IP.env
+                echo $CIRCLE_CI_IP
+                echo "Circle CI public IP is $ip"
       cluster_update:
         parameters:
           zone:
@@ -60,7 +63,7 @@ orbs:
           - run:
               name: Updating White Listed IP on clusters
               command: |
-                echo $HELLO
+                echo $CIRCLE_CI_IP
                 gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>> 
 
 # Orchestrate or schedule a set of jobs
