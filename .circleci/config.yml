@@ -37,7 +37,7 @@ orbs:
           - run:
               name: Getting circleci ip
               command: |
-                sudo apt-get install wget
+                apt-get install wget
                 circle_ci_ip=$(wget -qO- http://checkip.amazonaws.com)
                 echo "Circle CI public IP is $circle_ci_ip"
 
