@@ -57,7 +57,8 @@ orbs:
           - run:
               name: Updating White Listed IP on clusters
               command: |
-                echo $CIRCLE_CI_IP
+                echo "$circle_ci_ip"
+                echo $circle_ci_ip
                 gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>> 
 
 # Orchestrate or schedule a set of jobs
