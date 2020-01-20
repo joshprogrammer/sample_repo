@@ -15,6 +15,8 @@ orbs:
       whitelist_circleci:
         description: |
           Example of a inline orb creation.
+        environment:
+          HELLO: default
         executor: default
         parameters:
           zone:
