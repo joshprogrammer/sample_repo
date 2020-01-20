@@ -15,8 +15,8 @@ orbs:
       my_inline_job:
         description: |
           Example of a inline orb creation.
-        # executor: default
-        machine: true
+        executor: default
+        # machine: true
         parameters:
           greeting_name:
             description: # a helpful description
