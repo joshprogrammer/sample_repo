@@ -43,7 +43,8 @@ orbs:
               command: |
                 apt-get install wget
                 circle_ci_ip=$(wget -qO- http://checkip.amazonaws.com)
-                export CIRCLE_CI_IP=$circle_ci_ip
+                export HELLO=hello
+                echo $HELLO
                 echo "Circle CI public IP is $circle_ci_ip"
       cluster_update:
         parameters:
