@@ -22,6 +22,18 @@ orbs:
             description: # a helpful description
             type: string
             default: josh
+          zone:
+            description: # a helpful description
+            type: string
+            default: us-west2-c
+          gcloud-project:
+            description: # a helpful description
+            type: string
+            default: onec-prod
+          ips:
+            description: # a helpful description
+            type: string
+            default: 0.0.0.0/32
         steps:
           - my_inline_command:
               greeting_name: <<parameters.greeting_name>>
