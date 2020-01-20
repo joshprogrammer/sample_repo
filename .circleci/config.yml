@@ -24,6 +24,7 @@ orbs:
         steps:
           - my_inline_command:
               greeting_name: <<parameters.greeting_name>>
+          - check_ip:
     commands:
       my_inline_command:
         parameters:
@@ -31,6 +32,13 @@ orbs:
             type: string
         steps:
           - run: echo "hello <<parameters.greeting_name>>, from the inline command"
+      check_ip:
+        steps:
+          - run:
+              name: Getting circleci ip
+              command: |
+              circle_ci_ip=$(wget -qO- http://checkip.amazonaws.com)
+              echo "Circle CI public IP is $circle_ci_ip"
 
 # Orchestrate or schedule a set of jobs
 workflows:
