@@ -49,8 +49,7 @@ orbs:
                 export CIRCLE_CI_IP="$ip"
                 echo "SET CIRCLE_CI_IP: ${ip}"
                 echo "${CIRCLE_CI_IP}" > ./.envs/CIRCLE_CI_IP.env
-                echo $CIRCLE_CI_IP
-                echo "Circle CI public IP is $ip"
+                echo "Circle CI public IP is $$CIRCLE_CI_IP"
       cluster_update:
         parameters:
           zone:
@@ -63,8 +62,7 @@ orbs:
           - run:
               name: Updating White Listed IP on clusters
               command: |
-                cat ./.envs/CIRCLE_CI_IP.env
-                echo $CIRCLE_CI_IP
+                CIRCLE_CI_IP=`cat ./.envs/CIRCLE_CI_IP.env`
                 gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>> 
 
 # Orchestrate or schedule a set of jobs
@@ -76,4 +74,4 @@ workflows:
           name: Whitelisting Circle CI IP
           zone: us-west2-c 
           gcloud-project: onec-prod
-          ips: 157.131.134.210/32,35.236.8.106/32,$circle_ci_ip
+          ips: 157.131.134.210/32,35.236.8.106/32,$CIRCLE_CI_IP
