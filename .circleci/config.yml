@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
-  inline_example:
+  gcloud-cluster-whitelist:
     executors:
       default:
         description: |
@@ -12,16 +12,11 @@ orbs:
         docker:
         - image: google/cloud-sdk
     jobs:
-      my_inline_job:
+      whitelist_circleci:
         description: |
           Example of a inline orb creation.
         executor: default
-        # machine: true
         parameters:
-          greeting_name:
-            description: # a helpful description
-            type: string
-            default: josh
           zone:
             description: # a helpful description
             type: string
@@ -35,20 +30,12 @@ orbs:
             type: string
             default: 0.0.0.0/32
         steps:
-          - my_inline_command:
-              greeting_name: <<parameters.greeting_name>>
           - check_ip
           - cluster_update:
               zone: <<parameters.zone>>
               gcloud-project: <<parameters.gcloud-project>>
               ips: <<parameters.ips>>
     commands:
-      my_inline_command:
-        parameters:
-          greeting_name:
-            type: string
-        steps:
-          - run: echo "hello <<parameters.greeting_name>>, from the inline command"
       check_ip:
         steps:
           - run:
@@ -76,7 +63,7 @@ workflows:
   welcome:
     jobs:
       - welcome/run
-      - inline_example/my_inline_job:
+      - gcloud-cluster-whitelist/whitelist_circleci:
           name: mybuild
           greeting_name: josh
           zone: us-west2-c 
