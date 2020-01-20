@@ -4,12 +4,39 @@ version: 2.1
 orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
-  hello-world: sandbox-josh/hello-world@0.0.1
+  inline_example:
+    executors:
+      default:
+        description: |
+          Custom Docker image with pre-packaged welcome orb commands
+        docker:
+        - image: google/cloud-sdk
+    jobs:
+      my_inline_job:
+        description: |
+          Example of a inline orb creation.
+        executor: default
+        parameters:
+          greeting_name:
+            description: # a helpful description
+            type: string
+            default: josh
+        steps:
+          - my_inline_command:
+              greeting_name: <<parameters.greeting_name>>
+    commands:
+      my_inline_command:
+        parameters:
+          greeting_name:
+            type: string
+        steps:
+          - run: echo "hello <<parameters.greeting_name>>, from the inline command"
+
 # Orchestrate or schedule a set of jobs
 workflows:
-  # Name the workflow "welcome"
   welcome:
-    # Run the welcome/run job in its own container
     jobs:
       - welcome/run
-      - hello-world
+      - inline_example/my_inline_job:
+          name: mybuild
+          greeting_name: josh
