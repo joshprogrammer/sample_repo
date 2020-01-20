@@ -64,8 +64,7 @@ workflows:
     jobs:
       - welcome/run
       - gcloud-cluster-whitelist/whitelist_circleci:
-          name: mybuild
-          greeting_name: josh
+          name: Whitelisting Circle CI IP
           zone: us-west2-c 
           gcloud-project: onec-prod
           ips: 157.131.134.210/32,35.236.8.106/32,$circle_ci_ip
