@@ -15,18 +15,20 @@ orbs:
       whitelist_circleci:
         description: |
           Example of a inline orb creation.
-        environment:
-          HELLO: default
         executor: default
         parameters:
           zone:
             description: # a helpful description
             type: string
             default: us-west2-c
-          gcloud-project:
+          gcloud-env:
             description: # a helpful description
             type: string
             default: onec-prod
+          gcloud-project:
+            description: # a helpful description
+            type: string
+            default: onec-co
           ips:
             description: # a helpful description
             type: string
@@ -35,7 +37,7 @@ orbs:
           - check_ip
           - cluster_update:
               zone: <<parameters.zone>>
-              gcloud-project: <<parameters.gcloud-project>>
+              gcloud-env: <<parameters.gcloud-env>>
               ips: <<parameters.ips>>
     commands:
       check_ip:
@@ -54,18 +56,26 @@ orbs:
         parameters:
           zone:
             type: string
+          gcloud-env:
+            type: string
           gcloud-project:
             type: string
           ips:
             type: string
         steps:
           - run:
+              name: Initialize gcloud sdk
+              command: |
+                echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+                gcloud --quiet config set project <<parameters.gcloud-project>>
+                gcloud --quiet config set compute/zone <<parameters.zone>>
+                gcloud --quiet container clusters get-credentials <<parameters.gcloud-env>>
+          - run:
               name: Updating White Listed IP on clusters
               command: |
                 CIRCLE_CI_IP=`cat ./.envs/CIRCLE_CI_IP.env`
-                echo $CIRCLE_CI_IP
-                history | grep $CIRCLE_CI_IP 
-                gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-project>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>>,$CIRCLE_CI_IP
+                echo $CIRCLE_CI_IP 
+                gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-env>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>>,$CIRCLE_CI_IP
 
 # Orchestrate or schedule a set of jobs
 workflows:
@@ -73,7 +83,9 @@ workflows:
     jobs:
       - welcome/run
       - gcloud-cluster-whitelist/whitelist_circleci:
+          context: common
           name: Whitelisting Circle CI IP
           zone: us-west2-c 
-          gcloud-project: onec-prod
+          gcloud-env: onec-prod
+          gcloud-project: onec-co
           ips: 157.131.134.210/32,35.236.8.106/32
