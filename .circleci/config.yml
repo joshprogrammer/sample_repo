@@ -38,6 +38,7 @@ orbs:
           - cluster_update:
               zone: <<parameters.zone>>
               gcloud-env: <<parameters.gcloud-env>>
+              gcloud-project: <<parameters.gcloud-project>>
               ips: <<parameters.ips>>
     commands:
       check_ip:
