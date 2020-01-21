@@ -67,6 +67,7 @@ orbs:
           - run:
               name: Initialize gcloud sdk
               command: |
+                echo $GCLOUD_SERVICE_KEY  
                 echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
                 gcloud --quiet config set project <<parameters.gcloud-project>>
                 gcloud --quiet config set compute/zone <<parameters.zone>>
