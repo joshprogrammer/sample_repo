@@ -2,8 +2,7 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  gcloud-cluster-whitelist: oneconcern/gcloud-cluster-whitelist@0.0.5
-  welcome: circleci/welcome-orb@0.4.1
+  whitelist: oneconcern/gcloud-cluster-whitelist@0.0.5
   # gcloud-cluster-whitelist:
   #   executors:
   #     default:
@@ -83,8 +82,7 @@ orbs:
 workflows:
   example:
     jobs:
-      - welcome/run
-      - gcloud-cluster-whitelist/whitelist-circleci:
+      - whitelist/whitelist-circleci:
           name: Whitelisting Circle CI IP
           zone: us-west2-c 
           gke_cluster: onec-prod
