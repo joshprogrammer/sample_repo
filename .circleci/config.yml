@@ -2,7 +2,7 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  whitelist: oneconcern/gcloud-cluster-whitelist@0.0.5
+  whitelist: oneconcern/gcloud-cluster-whitelist@0.0.6
   # gcloud-cluster-whitelist:
   #   executors:
   #     default:
