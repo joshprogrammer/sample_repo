@@ -4,90 +4,91 @@ version: 2.1
 orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
-  gcloud-cluster-whitelist:
-    executors:
-      default:
-        description: |
-          Custom Docker image with pre-packaged welcome orb commands
-        docker:
-        - image: google/cloud-sdk
-    jobs:
-      whitelist_circleci:
-        description: |
-          Example of a inline orb creation.
-        executor: default
-        parameters:
-          zone:
-            description: # a helpful description
-            type: string
-            default: us-west2-c
-          gcloud-env:
-            description: # a helpful description
-            type: string
-            default: onec-prod
-          gcloud-project:
-            description: # a helpful description
-            type: string
-            default: onec-co
-          ips:
-            description: # a helpful description
-            type: string
-            default: 0.0.0.0/32
-        steps:
-          - check_ip
-          - cluster_update:
-              zone: <<parameters.zone>>
-              gcloud-env: <<parameters.gcloud-env>>
-              gcloud-project: <<parameters.gcloud-project>>
-              ips: <<parameters.ips>>
-    commands:
-      check_ip:
-        steps:
-          - run:
-              name: Getting circleci ip
-              command: |
-                apt-get install wget
-                ip=$(wget -qO- http://checkip.amazonaws.com)
-                mkdir -pv .envs
-                export CIRCLE_CI_IP="$ip"
-                echo "SET CIRCLE_CI_IP: ${ip}"
-                echo "${CIRCLE_CI_IP}" > ./.envs/CIRCLE_CI_IP.env
-                echo "Circle CI public IP is $ip"
-      cluster_update:
-        parameters:
-          zone:
-            type: string
-          gcloud-env:
-            type: string
-          gcloud-project:
-            type: string
-          ips:
-            type: string
-        steps:
-          - run:
-              name: Initialize gcloud sdk
-              command: |
-                echo $GCLOUD_SERVICE_KEY  
-                echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account jmachadosilva@oneconcern.com --key-file=-
-                gcloud --quiet config set project <<parameters.gcloud-project>>
-                gcloud --quiet config set compute/zone <<parameters.zone>>
-                gcloud --quiet container clusters get-credentials <<parameters.gcloud-env>>
-          - run:
-              name: Updating White Listed IP on clusters
-              command: |
-                CIRCLE_CI_IP=`cat ./.envs/CIRCLE_CI_IP.env`
-                echo $CIRCLE_CI_IP 
-                gcloud container clusters update --zone <<parameters.zone>> <<parameters.gcloud-env>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>>,$CIRCLE_CI_IP
+  gcloud-cluster-whitelist: oneconcern/gcloud-cluster-whitelist@0.0.1
+  # gcloud-cluster-whitelist:
+  #   executors:
+  #     default:
+  #       description: |
+  #         Custom Docker image with pre-packaged welcome orb commands
+  #       docker:
+  #       - image: google/cloud-sdk
+  #   jobs:
+  #     whitelist_circleci:
+  #       description: |
+  #         Example of a inline orb creation.
+  #       executor: default
+  #       parameters:
+  #         zone:
+  #           description: # a helpful description
+  #           type: string
+  #           default: us-west2-c
+  #         gke_cluster:
+  #           description: # a helpful description
+  #           type: string
+  #           default: onec-prod
+  #         gcloud-project:
+  #           description: # a helpful description
+  #           type: string
+  #           default: onec-co
+  #         ips:
+  #           description: # a helpful description
+  #           type: string
+  #           default: 0.0.0.0/32
+  #       steps:
+  #         - check_ip
+  #         - cluster_update:
+  #             zone: <<parameters.zone>>
+  #             gke_cluster: <<parameters.gke_cluster>>
+  #             gcloud-project: <<parameters.gcloud-project>>
+  #             ips: <<parameters.ips>>
+  #   commands:
+  #     check_ip:
+  #       steps:
+  #         - run:
+  #             name: Getting circleci ip
+  #             command: |
+  #               apt-get install wget
+  #               ip=$(wget -qO- http://checkip.amazonaws.com)
+  #               mkdir -pv .envs
+  #               export CIRCLE_CI_IP="$ip"
+  #               echo "SET CIRCLE_CI_IP: ${ip}"
+  #               echo "${CIRCLE_CI_IP}" > ./.envs/CIRCLE_CI_IP.env
+  #               echo "Circle CI public IP is $ip"
+  #     cluster_update:
+  #       parameters:
+  #         zone:
+  #           type: string
+  #         gke_cluster:
+  #           type: string
+  #         gcloud-project:
+  #           type: string
+  #         ips:
+  #           type: string
+  #       steps:
+  #         - run:
+  #             name: Initialize gcloud sdk
+  #             command: |
+  #               echo $GCLOUD_SERVICE_KEY  
+  #               echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+  #               gcloud --quiet config set project <<parameters.gcloud-project>>
+  #               gcloud --quiet config set compute/zone <<parameters.zone>>
+  #               gcloud --quiet container clusters get-credentials <<parameters.gke_cluster>>
+  #         - run:
+  #             name: Updating White Listed IP on clusters
+  #             command: |
+  #               CIRCLE_CI_IP=`cat ./.envs/CIRCLE_CI_IP.env`
+  #               echo $CIRCLE_CI_IP 
+  #               gcloud container clusters update --zone <<parameters.zone>> <<parameters.gke_cluster>> --enable-master-authorized-networks --master-authorized-networks <<parameters.ips>>,$CIRCLE_CI_IP
 
 # Orchestrate or schedule a set of jobs
 workflows:
-  welcome:
+  example:
     jobs:
       - welcome/run
       - gcloud-cluster-whitelist/whitelist_circleci:
           context: common
           name: Whitelisting Circle CI IP
           zone: us-west2-c 
-          gcloud-env: onec-prod
+          gke_cluster: onec-prod
           gcloud-project: onec-co
           ips: 157.131.134.210/32,35.236.8.106/32
